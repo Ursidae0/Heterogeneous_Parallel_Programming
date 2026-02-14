@@ -1,0 +1,18 @@
+==8161== NVPROF is profiling process 8161, command: ./detectnet --network=peoplenet images/humans_*.jpg images/test/humans_output_peoplenet_%i.jpg
+==8161== Profiling application: ./detectnet --network=peoplenet images/humans_*.jpg images/test/humans_output_peoplenet_%i.jpg
+==8161== Profiling result:
+==8161== Metric result:
+"Device","Kernel","Invocations","Metric Name","Metric Description","Min","Max","Avg"
+"NVIDIA Tegra X1 (0)","void cuInt8::nchwToNchhw2<float>(float const *, __half*, int, int, int, int, int, int, cuInt8::ReducedDivisorParameters)",10,"sm_efficiency","Multiprocessor Activity",99.890802%,99.898098%,99.896824%
+"NVIDIA Tegra X1 (0)","generatedNativePointwise",10,"sm_efficiency","Multiprocessor Activity",75.187735%,81.285714%,79.892742%
+"NVIDIA Tegra X1 (0)","trt_maxwell_fp16x2_hcudnn_fp16x2_128x32_relu_interior_nn_v1",20,"sm_efficiency","Multiprocessor Activity",99.202495%,99.293913%,99.251093%
+"NVIDIA Tegra X1 (0)","void gpuTensorNorm<uchar3, bool=0>(float2, uchar3*, int, float*, int, int, float, float)",10,"sm_efficiency","Multiprocessor Activity",99.906168%,99.966509%,99.948159%
+"NVIDIA Tegra X1 (0)","trt_maxwell_fp16x2_hcudnn_fp16x2_128x128_relu_interior_nn_v1",10,"sm_efficiency","Multiprocessor Activity",99.696242%,99.728424%,99.717834%
+"NVIDIA Tegra X1 (0)","trt_maxwell_fp16x2_hcudnn_fp16x2_128x128_relu_small_nn_v1",30,"sm_efficiency","Multiprocessor Activity",99.614975%,99.946500%,99.842333%
+"NVIDIA Tegra X1 (0)","trt_maxwell_fp16x2_hcudnn_winograd_fp16x2_128x128_ldg1_ldg4_relu_tile148m_nt_v1",290,"sm_efficiency","Multiprocessor Activity",65.952722%,99.990390%,99.451511%
+"NVIDIA Tegra X1 (0)","trt_maxwell_fp16x2_hcudnn_fp16x2_128x64_relu_interior_nn_v1",130,"sm_efficiency","Multiprocessor Activity",76.584552%,99.940454%,99.651246%
+"NVIDIA Tegra X1 (0)","trt_maxwell_fp16x2_hcudnn_fp16x2_128x64_relu_medium_nn_v1",10,"sm_efficiency","Multiprocessor Activity",80.182696%,99.983767%,92.842689%
+"NVIDIA Tegra X1 (0)","void gpuDetectionOverlayBox<uchar3>(uchar3*, uchar3*, int, int, int, int, int, int, float4)",54,"sm_efficiency","Multiprocessor Activity",80.211108%,99.966675%,95.140558%
+"NVIDIA Tegra X1 (0)","void cuInt8::nchhw2ToNchw<float>(__half const *, float*, int, int, int, int, int, int, cuInt8::ReducedDivisorParameters)",20,"sm_efficiency","Multiprocessor Activity",74.302041%,91.716788%,83.291410%
+"NVIDIA Tegra X1 (0)","void gpuOverlayText<uchar3>(unsigned char*, int, GlyphCommand*, uchar3*, uchar3*, int, int, float4)",54,"sm_efficiency","Multiprocessor Activity",95.872141%,98.347863%,97.359558%
+"NVIDIA Tegra X1 (0)","trt_maxwell_fp16x2_hcudnn_fp16x2_128x64_relu_small_nn_v1",20,"sm_efficiency","Multiprocessor Activity",70.438734%,99.971738%,90.173629%

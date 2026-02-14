@@ -1,0 +1,53 @@
+CENG443 Fall 2025 - Programming Assignment 3
+
+Eren IŞIK
+
+
+V1: select_reduce (pa3_v1.cpp)
+
+	Serial Execution (g++)
+	Compile: g++ -std=c++20 -O3 -o pa3_v1_serial pa3_v1.cpp
+	Run: ./pa3_v1_serial 10000000
+	OK! Sum = 166542255
+	Bandwidth [GB/s]: 5.73372
+
+CPU Parallel Execution (nvc++ multicore)
+
+	Compile: nvc++ -std=c++20 -O3 -stdpar=multicore -o pa3_v1_multicore pa3_v1.cpp
+	Run: ./pa3_v1_multicore 10000000
+	OK! Sum = 166542255
+	Bandwidth [GB/s]: 8.06932
+
+GPU Parallel Execution (nvc++ gpu)
+
+	Compile: nvc++ -std=c++20 -O3 -stdpar=gpu -o pa3_v1_gpu pa3_v1.cpp
+	Run: ./pa3_v1_gpu 10000000
+	OK! Sum = 166542255
+	Bandwidth [GB/s]: 508.647
+
+
+V2: fused_select_reduce (pa3_v2.cpp)
+
+
+Serial Execution (g++)
+
+	Compile: g++ -std=c++20 -O3 -o pa3_v2_serial pa3_v2.cpp
+	Run: ./pa3_v2_serial 10000000
+	OK! Sum = 166542255
+	Bandwidth [GB/s]: 4e+07
+
+Note: Because the fused operation does not modify external memory and benchmark loop does not use the returned sum, the compiler optimized the loop entirely. I have reported the value exactly as generated to maintain the integrity of the collected data.
+
+CPU Parallel Execution (nvc++ multicore)
+
+	Compile: nvc++ -std=c++20 -O3 -stdpar=multicore -o pa3_v2_multicore pa3_v2.cpp
+	Run: ./pa3_v2_multicore 10000000
+	OK! Sum = 166542255
+	Bandwidth [GB/s]: 20.2569
+
+GPU Parallel Execution (nvc++ gpu)
+
+	Compile: nvc++ -std=c++20 -O3 -stdpar=gpu -o pa3_v2_gpu pa3_v2.cpp
+	Run: ./pa3_v2_gpu 10000000
+	OK! Sum = 166542255
+	Bandwidth [GB/s]: 394.088
