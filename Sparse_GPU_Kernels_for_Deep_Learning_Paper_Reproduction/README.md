@@ -1,69 +1,30 @@
-# Sparse GPU Kernels for Deep Learning — Paper Reproduction
+# Sparse GPU Kernels for Deep Learning — Course Reproduction
 
-Reproduction of **"Sparse GPU Kernels for Deep Learning"** (Gale et al., 2020) on an NVIDIA RTX 4070 Super. The original paper benchmarks SpMM (Sparse Matrix–Matrix Multiplication) and sparse depthwise convolution on a V100; this work reproduces the key findings on a consumer Ampere-generation GPU using the Sputnik library.
+This course-team study adapted and benchmarked the **original [Sputnik](https://github.com/google-research/sputnik) implementation** on an NVIDIA GeForce RTX 4070 Super. Our contribution was environment porting, compatibility fixes, benchmark execution, and analysis—not authorship of Sputnik's GPU kernels. The accompanying [report](Reproduction_Report.pdf) describes the experiments and results.
 
-**Paper**: T. Gale, M. Zaharia, C. Young, E. Elsen — *Sparse GPU Kernels for Deep Learning*, NeurIPS 2020
+**Original paper:** T. Gale, M. Zaharia, C. Young, and E. Elsen, [“Sparse GPU Kernels for Deep Learning”](https://people.eecs.berkeley.edu/~matei/papers/2020/sc_sparse_gpu.pdf), **SC '20** (not NeurIPS 2020).
 
----
+## Scope and environment
 
-## What Was Reproduced
+- GPU: GeForce RTX 4070 Super (12 GB, **Ada Lovelace** architecture).
+- Workstation OS: Ubuntu 22.04. The report describes porting to CUDA 13.1, targeting compute capability 8.9 in CMake, and fixing an Abseil `std::max` type mismatch by casting to `size_t`.
+- The report also describes a custom container based on `nvidia/cuda:12.2.2-devel-ubuntu22.04`. Because neither that Dockerfile nor the patched source is published here, the exact build environment for the reported runs cannot be reconstructed from this folder alone.
+- We ran Sputnik's benchmark suite for sparse matrix–dense matrix multiplication (SpMM), sampled dense–dense matrix multiplication (SDDMM), and depthwise convolution. The SpMM comparisons include cuSPARSE and dense cuBLAS. This is a **limited reproduction on different hardware**, not a reimplementation or validation of every result in the original paper.
 
-- SpMM throughput curves vs. sparsity level for Sputnik, cuSPARSE, and dense cuBLAS
-- Sparsity break-even point: the crossover where sparse beats dense
-- Sparse depthwise convolution at varying input resolutions
+## Results reported in the course report
 
----
-
-## Key Results (RTX 4070 Super, CUDA 13.1)
-
-| Metric | This Reproduction | Paper (V100) |
+| Experiment | Reported observation | Scope |
 |---|---|---|
-| Sparsity break-even (SpMM vs cuBLAS) | **70.5%** | ~71% |
-| Peak SpMM throughput (Sputnik) | **>4.3 TFLOPs** | — |
-| cuSPARSE throughput plateau | 1.2–1.4 TFLOPs | — |
-| Speedup vs. cuBLAS at 99% sparsity (8192×2048×128) | **7.8x** (172 µs vs 1,344 µs) | — |
-| Max speedup vs. cuSPARSE (large matrices) | **3.5x** | — |
-| Depthwise conv peak throughput | 1.42 T/s at 112×112 | — |
+| SpMM sparse/dense crossover | About **70.5% sparsity** | Sputnik versus dense cuBLAS for the reported 8192 × 2048 × 128 case; not a universal threshold. |
+| SpMM at 99% sparsity | About **39 µs** for Sputnik versus **299 µs** for dense cuBLAS | Same reported matrix case; about 7.7× using these rounded times. The report describes this as 7.8×. |
+| SpMM throughput | Peak above **4.3 TFLOP/s** for Sputnik; cuSPARSE around **1.2–1.4 TFLOP/s** | Reported benchmark plots and tested problem sizes. |
+| SpMM versus cuSPARSE | Up to **3.5×** faster | Large tested matrices in the report; not a claim for all inputs. |
+| Depthwise convolution | Peak **1.42 T/s** at 112 × 112 | As labeled in the report; the benchmark's throughput unit is not further defined here. |
 
-The 70.5% break-even on RTX 4070 Super closely matches the paper's ~71% on V100, confirming that kernel efficiency scales across GPU generations despite architectural differences.
+The previous README paired **172 µs / 1,344 µs** with the 99%-sparsity result. Those numbers are not the 99% case shown in the report: it reports **172 µs / 299 µs at 90%** and **39 µs / 299 µs at 99%** for the matrix above. The table now follows the report. These are **report-derived results**; raw benchmark logs and plotting inputs are not included in this repository.
 
----
+## Reproduction status
 
-## Architecture Notes
+This folder currently contains the report and this summary, **not a runnable benchmark checkout**. In particular, it does not contain the modified Sputnik source, Dockerfile, `benchmark.cu`, build scripts, or raw outputs. The old `nvcc ... benchmark.cu` instruction was removed because it could not run from this folder. For the starting code, see [upstream Sputnik](https://github.com/google-research/sputnik). Reproducing these exact reported runs would additionally require the team's compatibility changes, complete build commands, benchmark configuration, and raw outputs.
 
-**Why Sputnik outperforms cuSPARSE here:**
-- Sputnik exploits row-level load balancing optimized for deep learning weight matrices (structured sparsity patterns)
-- cuSPARSE is a general-purpose library; its kernels are not co-optimized for the column distributions common in pruned DNN weights
-- At low-to-moderate sparsity (<70%), the overhead of sparse indexing dominates — hence the break-even point
-
-**Matrix dimensions tested** follow the paper's benchmark set (e.g., 8192×2048×128), which represents realistic transformer/MLP weight shapes.
-
----
-
-## How to Run
-
-The benchmarks require the Sputnik library, CUDA toolkit, and cuSPARSE (included with CUDA).
-
-```bash
-# Build and run (see Reproduction_Report.pdf for full setup)
-nvcc -O3 -lcusparse benchmark.cu -o benchmark
-./benchmark
-```
-
-Full setup instructions, environment details, and raw output plots are in `Reproduction_Report.pdf`.
-
----
-
-## Hardware
-
-- GPU: NVIDIA GeForce RTX 4070 Super (12 GB GDDR6X, Ada Lovelace, 2560 CUDA cores)
-- CUDA: 13.1
-- OS: Ubuntu 22.04
-
----
-
-## Limitations and Honest Assessment
-
-- Depthwise convolution results are hardware-dependent; absolute TFLOPs differ from V100 results in the paper
-- The paper's full benchmark suite includes additional matrix shapes not reproduced here
-- Sputnik's structured sparsity assumption holds well for pruned DNNs but degrades for truly random sparsity patterns
+The techniques discussed in the report—such as subwarp tiling, reverse-offset memory alignment, and row swizzling—come from the **original Sputnik work**. The observed crossover on this one GPU/setup is similar to that cited for the V100 in the report, but does not establish that performance scales generally across GPU generations.
